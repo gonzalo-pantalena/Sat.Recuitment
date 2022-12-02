@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Sat.Recruitment.Api.Interfaces;
 using Sat.Recruitment.Api.Models;
 using Sat.Recruitment.Api.Repositories;
+using System.Text.Json.Serialization;
 
 namespace Sat.Recruitment.Api
 {
@@ -25,6 +26,10 @@ namespace Sat.Recruitment.Api
             services.AddSwaggerGen();
             AddConstants(services);
             AddRepositories(services);
+            services.AddMvcCore().AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +39,7 @@ namespace Sat.Recruitment.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),

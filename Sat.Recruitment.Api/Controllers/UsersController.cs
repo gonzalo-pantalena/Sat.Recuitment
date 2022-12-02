@@ -36,11 +36,20 @@ namespace Sat.Recruitment.Api.Controllers
         /// <param name="money"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("/v1/create-user")]
         [Route("/create-user")]
-        public Result CreateUser(string name, string email, string address, string phone, string userType, string money)
-        {
-            var newUser = new User(name, email, address, phone, userType, money);
+        public Result CreateUser(string name, string email, string address, string phone, string userType, string money) 
+            => CreateUser(new User(name, email, address, phone, userType, money));
 
+        /// <summary>
+        /// Create User V2
+        /// </summary>
+        /// <param name="newUser"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("/v2/create-user")]
+        public Result CreateUser(User newUser)
+        {
             if (newUser.HasErrors(out var errors))
             {
                 return new Result(false, errors);
