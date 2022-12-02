@@ -1,7 +1,7 @@
-﻿using Sat.Recruitment.Api.Controllers.Enums;
+﻿using Sat.Recruitment.Api.Models.Enums;
 using System;
 
-namespace Sat.Recruitment.Api.Controllers.Models
+namespace Sat.Recruitment.Api.Models
 {
     public class User
     {
@@ -18,8 +18,8 @@ namespace Sat.Recruitment.Api.Controllers.Models
             Email = email;
             Address = address;
             Phone = phone;
-            UserType = Enum.Parse<UserType>(userType);
-            Money = decimal.Parse(money);
+            UserType = Enum.TryParse<UserType>(userType, true, out var type) ? type : UserType.Normal;
+            Money = decimal.TryParse(money, out var dMoney) ? dMoney : 0;
         }
     }
 }

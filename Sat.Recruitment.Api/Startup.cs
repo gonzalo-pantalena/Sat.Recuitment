@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sat.Recruitment.Api.Interfaces;
+using Sat.Recruitment.Api.Models;
+using Sat.Recruitment.Api.Repositories;
 
 namespace Sat.Recruitment.Api
 {
@@ -20,6 +23,8 @@ namespace Sat.Recruitment.Api
         {
             services.AddControllers();
             services.AddSwaggerGen();
+            AddConstants(services);
+            AddRepositories(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +50,16 @@ namespace Sat.Recruitment.Api
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void AddConstants(IServiceCollection services)
+        {
+            services.AddSingleton(Configuration.GetSection("FileConfig").Get<FileConfig>());
+        }
+
+        private void AddRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IUsersRepository, UsersRepository>();
         }
     }
 }

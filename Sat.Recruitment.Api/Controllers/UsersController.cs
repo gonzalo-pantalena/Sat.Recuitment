@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Sat.Recruitment.Api.Controllers.Enums;
-using Sat.Recruitment.Api.Controllers.Models;
-using System;
-using System.Collections.Generic;
+using Sat.Recruitment.Api.Interfaces;
+using Sat.Recruitment.Api.Models;
+using Sat.Recruitment.Api.Extensions;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace Sat.Recruitment.Api.Controllers
@@ -20,10 +18,11 @@ namespace Sat.Recruitment.Api.Controllers
         public const string AddressRequired = "The address is required";
         public const string PhoneRequired = "The phone is required";
 
-        private readonly List<User> _users = new List<User>();
+        private readonly IUsersRepository _usersRepository;
 
-        public UsersController()
+        public UsersController(IUsersRepository usersRepository)
         {
+            _usersRepository = usersRepository;
         }
 
         /// <summary>
@@ -42,18 +41,18 @@ namespace Sat.Recruitment.Api.Controllers
         {
             var newUser = new User(name, email, address, phone, userType, money);
 
-            if (HasErrors(newUser, out var errors))
+            if (newUser.HasErrors(out var errors))
             {
                 return new Result(false, errors);
             }
 
-            RecalculateAmount(newUser);
+            newUser.RecalculateAmount();
 
-            NormalizeEmail(newUser);
+            newUser.NormalizeEmail();
 
-            StoreUsersFromFile();
+            var users = _usersRepository.GetUsers();
 
-            if (!_users.Any(u => u.Email == newUser.Email || u.Phone == newUser.Phone || (u.Name == newUser.Name && u.Address == newUser.Address)))
+            if (!users.Any(u => u.Email == newUser.Email || u.Phone == newUser.Phone || (u.Name == newUser.Name && u.Address == newUser.Address)))
             {
                 Debug.WriteLine(CreatedUserMessage);
 
@@ -65,99 +64,6 @@ namespace Sat.Recruitment.Api.Controllers
 
                 return new Result(false, DuplicatedUserMessage);
             }
-        }
-
-        //Validate errors
-        private bool HasErrors(User user, out string errors)
-        {
-            var errorlist = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(user.Name))
-            {
-                errorlist.Add(NameRequired);
-            }
-            if (string.IsNullOrWhiteSpace(user.Email))
-            {
-                errorlist.Add(EmailRequired);
-            }
-            if (string.IsNullOrWhiteSpace(user.Address))
-            {
-                errorlist.Add(AddressRequired);
-            }
-            if (string.IsNullOrWhiteSpace(user.Phone))
-            {
-                errorlist.Add(PhoneRequired);
-            }
-
-            errors = string.Join(", ", errorlist);
-
-            return errorlist.Any();
-        }
-
-        private static void RecalculateAmount(User newUser)
-        {
-            switch (newUser.UserType)
-            {
-                case UserType.Normal:
-                    if (newUser.Money > 100)
-                    {
-                        newUser.Money *= 1.12m;
-                    }
-                    if (newUser.Money < 100 && newUser.Money > 10)
-                    {
-                        newUser.Money *= 1.8m;
-                    }
-                    break;
-                case UserType.SuperUser:
-                    if (newUser.Money > 100)
-                    {
-                        newUser.Money *= 1.2m;
-                    }
-                    break;
-                case UserType.Premium:
-                    if (newUser.Money > 100)
-                    {
-                        newUser.Money *= 3;
-                    }
-                    break;
-            }
-        }
-
-        private static void NormalizeEmail(User newUser)
-        {
-            var aux = newUser.Email.Split(new char[] { '@' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            aux[0] = aux[0].Replace(".", "");
-            
-            var atIndex = aux[0].IndexOf("+", StringComparison.Ordinal);
-
-            if (atIndex >= 0)
-            {
-                aux[0] = aux[0][..atIndex];
-            }
-
-            newUser.Email = $"{aux[0]}@{aux[1]}";
-        }
-
-        private void StoreUsersFromFile()
-        {
-            string[] userData;
-
-            using var reader = ReadUsersFromFile();
-
-            while (reader.Peek() >= 0)
-            {
-                userData = reader.ReadLineAsync().Result.Split(',');
-
-                _users.Add(new User(userData[0], userData[1], userData[2], userData[3], userData[4], userData[5]));
-            }
-        }
-
-        private StreamReader ReadUsersFromFile()
-        {
-            var fileStream = new FileStream($"{Directory.GetCurrentDirectory()}/Files/Users.txt", FileMode.Open);
-
-            return new StreamReader(fileStream);
         }
     }
 }
