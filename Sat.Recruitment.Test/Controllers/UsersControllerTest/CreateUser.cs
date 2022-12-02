@@ -5,10 +5,10 @@ using Sat.Recruitment.Api.Models;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Sat.Recruitment.Test
+namespace Sat.Recruitment.Test.Controllers.UsersControllerTest
 {
     [CollectionDefinition("Tests", DisableParallelization = true)]
-    public class ControllersUnitTests
+    public class RecalculateAmount
     {
         private Mock<IUsersRepository> _usersRepository;
 
@@ -16,7 +16,7 @@ namespace Sat.Recruitment.Test
         {
             new User("Agustina", "Agustina@gmail.com", "Av. Juan G", "+349 1122354215", "Normal", "124")
         };
-        
+
         private UsersController InitController()
         {
             _usersRepository = new Mock<IUsersRepository>();

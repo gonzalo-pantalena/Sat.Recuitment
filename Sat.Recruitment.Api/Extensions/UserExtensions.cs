@@ -39,7 +39,7 @@ namespace Sat.Recruitment.Api.Extensions
             return errorlist.Any();
         }
 
-        public static void RecalculateAmount(this User newUser)
+        public static void RecalculateMoney(this User newUser)
         {
             switch (newUser.UserType)
             {
@@ -48,7 +48,7 @@ namespace Sat.Recruitment.Api.Extensions
                     {
                         newUser.Money *= 1.12m;
                     }
-                    if (newUser.Money < 100 && newUser.Money > 10)
+                    if (newUser.Money <= 100 && newUser.Money > 10)
                     {
                         newUser.Money *= 1.8m;
                     }

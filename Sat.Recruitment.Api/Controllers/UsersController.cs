@@ -46,7 +46,7 @@ namespace Sat.Recruitment.Api.Controllers
                 return new Result(false, errors);
             }
 
-            newUser.RecalculateAmount();
+            newUser.RecalculateMoney();
 
             newUser.NormalizeEmail();
 

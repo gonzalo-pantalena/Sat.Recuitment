@@ -1,22 +1,18 @@
-using Moq;
-using Sat.Recruitment.Api.Controllers;
-using Sat.Recruitment.Api.Interfaces;
 using Sat.Recruitment.Api.Models;
 using Sat.Recruitment.Api.Models.Enums;
 using Sat.Recruitment.Api.Repositories;
-using System.Collections.Generic;
 using Xunit;
 
-namespace Sat.Recruitment.Test
+namespace Sat.Recruitment.Test.Repositories.UsersRepositoryTests
 {
     [CollectionDefinition("Tests", DisableParallelization = true)]
-    public class RepositoriesUnitTests
+    public class GetUsers
     {
         private FileConfig _config = new FileConfig
         {
             FilePath = "Files/Users.txt"
         };
-        
+
         private UsersRepository InitRepository()
         {
             return new UsersRepository(_config);
